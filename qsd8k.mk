@@ -21,9 +21,14 @@ PRODUCT_LOCALES := en
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
-# Prebuilt
+# Configs
 PRODUCT_COPY_FILES += \
-    device/htc/qsd8k-common/libOmxVidEnc.so:system/lib/libOmxVidEnc.so
+    device/htc/qsd8k-common/media_codecs.xml:system/etc/media_codecs.xml \
+    device/htc/qsd8k-common/audio_policy.conf:system/etc/audio_policy.conf
+
+# Misc
+PRODUCT_COPY_FILES += \
+    device/htc/qsd8k-common/init.power.rc:root/init.power.rc
 
 #
 # Required Packages
@@ -31,30 +36,36 @@ PRODUCT_COPY_FILES += \
 
 # Audio
 PRODUCT_PACKAGES += \
-    libaudioutils \
+    audio.usb.default \
     audio.a2dp.default \
     audio.primary.qsd8k \
     audio_policy.qsd8k
 
-# Adreno
+# Camera
+PRODUCT_PACKAGES += \
+    camera.qsd8k
+
+# Display
 PRODUCT_PACKAGES += \
     copybit.qsd8k \
     gralloc.qsd8k \
-    hwcomposer.qsd8k \
-    libgenlock \
-    libmemalloc \
-    libtilerenderer \
-    libQcomUI
+    hwcomposer.qsd8k
 
 # Omx
 PRODUCT_PACKAGES += \
     libOmxCore \
-    libOmxVidEnc \
     libOmxVdec \
     libstagefrighthw
+#    libOmxVidEnc \
+
+# Filesystem management tools
+PRODUCT_PACKAGES += \
+    make_ext4fs \
+    setup_fs
 
 # Misc
 PRODUCT_PACKAGES += \
+    power.qsd8k \
     com.android.future.usb.accessory
 
 #
@@ -65,13 +76,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.sf.hw=1 \
     debug.composition.type=mdp \
     debug.gr.numframebuffers=2
-
-# dirty_regions: "false" to disable partial invalidates, override if enabletr=true
-PRODUCT_PROPERTY_OVERRIDES += \
-    hwui.render_dirty_regions=false \
-    hwui.disable_vsync=true \
-    hwui.print_config=choice \
-    debug.enabletr=false
 
 #
 # Dalvik Properties
@@ -103,6 +107,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Wifi
 #
 
+# Firmware
+$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4329/device-bcm.mk)
+
 # Properties
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0 \
@@ -111,12 +118,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 #
 # Qcom
 #
-
-# Properties
-PRODUCT_PROPERTY_OVERRIDES += \
-    com.qc.hardware=1 \
-    dev.pm.dyn_samplingrate=1 \
-    ro.vendor.extension_library=/system/lib/libqc-opt.so
 
 # Init post-boot script
 PRODUCT_COPY_FILES += \
@@ -138,3 +139,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.distinct.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.distict.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml
+
+# Proprietary blobs
+$(call inherit-product-if-exists, vendor/htc/qsd8k-common/qsd8k-vendor.mk)
